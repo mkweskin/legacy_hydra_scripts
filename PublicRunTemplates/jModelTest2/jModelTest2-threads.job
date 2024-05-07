@@ -1,0 +1,1 @@
+/usr/java/latest/bin/java -jar /share/apps/NMNH/jModelTest2/jModelTest.jar -tr $NSLOTS -s 11 -f -i -g 4 -t ML -S NNI -p -v -AICc -d INPUTFILENAME

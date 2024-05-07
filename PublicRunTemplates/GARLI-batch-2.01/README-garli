@@ -1,0 +1,113 @@
+#########################################################################
+#                                                                       #
+#   Garli Hydra Submission                                              #
+#   6 Feb 2013                                                          #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#########################################################################
+
+1.  About
+2.  Configuring your garli.conf
+3.  Copying this folder
+4.  Input files
+5.  Editing garli.qsub
+	a. garli.conf name
+	b. Number of reps
+	c. Memory
+	d. Queues
+6.  Submitting your job
+7.  Output files
+8.  Checking your job
+9.  Getting your results
+10.  Post-run analysis (to be added)
+
+
+1. About
+This submission template uses an efficient parallel implementation of Garli. It allows you to run your separate search replicates (for a best-tree ML search) or bootstrap replicates (for a bootstrap search) across CPUs on the cluster. Each replicate (or rep) will run on a separate CPU in parallel with the other reps. At the end of the run you will have all the results from the reps for post-run analysis (creating consensus tree in a bootstrap run, determining best tree in a ML run). Please see the Garli Advanced Topics for more information on post-run processing (https://www.nescent.org/wg_garli/Advanced_topics)
+
+This template will use the version of Garli in /share/apps/NMNH/Garli/ which at the time of this writing is Garli 2.0, compiled with the Intel C Compiler (icc). The version to use is called in the script "garli_batch_handler" located in this folder. This script is called by each replicate run. It makes a copy of the garli.conf where it appends the replicate number to ofprefix in the configuration file and then starts the garli run.
+
+
+2. Configuring your garli.conf
+You will want to configure your garli.conf to run ONE best-tree search rep or bootstrap rep. The scripts in this folder will be what determines the number of reps performed rather than the garli.conf. (If you're doing a bootstrap run and you want more than one searchrep per bootstrap, you set "bootstrapreps = 1" and then set searchreps equal to the number of search reps per bootstrap).
+For a best-tree search:
+	searchreps = 1
+For a bootstrap analysis:
+	bootstrapreps = 1
+	(and keep searchreps equal to the number of reps you want per bootstrap)
+
+
+3. Copy this folder
+You will need to copy this folder to one of the shared Hydra directories: /pool/cluster1 - /pool/cluster7 (see https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerDisks).
+
+Use these commands to make a folder in one of the disk clusters and to copy this folder there (cluster1 shown as an example, replace yourusername with your hydra username and nameofjob a name to identify this run):
+
+	mkdir /pool/cluster1/yourusername   (if you haven't done that before)
+	cp -nR ~/PublicRunTemplates/garli-batch /pool/cluster1/yourusername/nameofjob
+	cd /pool/cluster1/yourusername/nameofjob
+
+
+4. Input files
+You will need to upload your input files (garli.conf and sequence file) to this directory after you copy it to one of the disk clusters (/pool/cluster1/yourusername in 3. above)
+
+File names should be Unix friendly: no spaces, limited special characters (.-_)
+
+Your configuration file doesn't have to be called garli.conf
+
+
+5.  Editing garli.qsub
+You need to edit the file garli.qsub to give information specified to your run. The items to edit are described in the file. Make sure to preserve the spacing shown in the examples in the file (e.g. not adding spaces after a '=').
+	a.  garli.conf name. The name of the garli.conf
+	b.  Number of reps. How many best-tree search reps or bootstrap reps to run.
+	c.  Memory. The amount of memory your garli.conf file requests. See here: https://www.nescent.org/wg_garli/GARLI_Configuration_Settings#availablemememory_.28control_maximum_program_memory_usage.29
+	d.  Queues. Which Hydra queue to use. See here: https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues This script uses the serial set of queues: sTz.q, mTz.q, lTz.q, uTz.q	 Each queue has a time limit for each search rep. If a rep goes longer than the time limit it will be killed by the cluster automatically, but other reps will continue. The longer the time limit on a queue, the smaller the number of CPUs that are allowed to be used concurrently for the job.
+	e.  Job Name. A name to help you identify your job in the list of running jobs on the cluster.
+	
+6.  Submitting your job
+After editing your garli.conf, garli.qsub you can start your run by typing:
+	qsub garli.qsub
+You will get a response like this: "Your job-array 3189454.1-50:1 ("garli.qsub") has been submitted" It's helpful, but not mandatory, to note your job number which is the large number after "Your job-array."
+
+Type "ls -l" to see if new files start appearing from the run. job.out and job.err have output logs from the run.
+After submitting your job and confirming that it's running you can exit the terminal session with "exit".
+
+
+7.  Output files
+job.out  All standard output from the runs
+job.err  All error message from the runs
+...runX.log00.log  Garli log file
+...runX.screen.log  All of the text output from a rep
+...runX.boot.tre  For bootstrap runs, a single bootstrap rep tree
+...rubX.best.tre  For a best-tree search, the tree found in one ML search rep
+
+
+8.  Checking your job
+You can check the status of your run with these commands
+   a.  qstat -u yourusername 
+       prints all your jobs, one line per rep current running
+   b.  qstat -u yourusername | grep jobnumber 
+       jobnumber is the large number you got after submitting your job
+   c.  qstat -u yourusername | grep jobnumber | wc -l
+       gives count of reps currently running for a job
+   d.  qstat -j jobnumber
+       lots of stats on your job
+With this type of job submission the email capabilities to notify you when your job is done would email you for _every_ rep complete so you will need to check the status manually on the cluster.
+
+
+9.  Getting your results
+Before transferring the results back to your computer you can compress the results to reduce transfer times. First change to your job folder from step 3 above and then use zip to zip the folder:
+	cd /pool/cluster1/yourusername/nameofjob
+	zip -r out.zip $PWD
+Then use your preferred transfer utility to move the zip file to your computer.
+
+
+10.  Post-run analysis (brief description)
+   a.  Best tree search:
+   - To get the ML score for each rep type: `grep -H  Replicate *screen.log` to get the ML score for each tree
+   - To get a paup block to read in all trees type: `echo \#nexus >myPaupBlock.nex; echo begin paup\; >>myPaupBlock.nex; for i in *.best.tre; do echo "gett file = $i mode=7;"; done >> myPaupBlock.nex; echo end\; >>myPaupBlock.nex`
+   (from http://www.nescent.org/wg_garli/Advanced_topics)
+   
+   b.  Bootstrap analysis:
+   - You can use Sumtrees (part of Dendropy http://packages.python.org/DendroPy/) to create a consensus tree from the bootstraps by using the script make_bootstrap_consensus in the GARLI-Batch folder. This script can be run from the login node without using qsub.
+      ./make_bootstrap_consensus
+   Your consensus tree will be called: all.boot.consensus.tre

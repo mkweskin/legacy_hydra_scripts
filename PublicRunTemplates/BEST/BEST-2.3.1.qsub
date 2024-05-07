@@ -1,0 +1,73 @@
+#########################################################################
+#                                                                       #
+#   BEST 2.3.1 Hydra Submission                                         #
+#   13 Mar 2013                                                         #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#   Please See the README in this folder for more information           #
+#                                                                       #
+#                                                                       #
+#########################################################################
+
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+##################
+#  Enter the name of your nexus file with your MrBayes block after the '='
+#  (make sure there're no spaces after the '=' or in your filename)
+
+NEXUSFILE=MyFile.nex
+
+
+##################
+#  Enter the number of CPUs to use after "#$ -pe orte "
+#  Each chain will be run on a sperate CPU, so enter the nChains * nRuns
+#  If you don't specify nChains in your mcmcp command, 4 is the default.
+#  If you don't specify nRuns in your mcmcp command, 2 is the default.
+#  See README for more information.
+
+#$ -pe orte 8
+
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+#    sTN.q (max for a rep is 3 hours, up to 768 CPUs used at once)
+#    mTN.q (max is 36 hours, up to 384 CPUs at once)
+#    lTN.q (max is 432 hours, up to 192 CPUs at once)
+
+#$ -q lTN.q
+
+
+##################
+#  Email address to be notified on job completion (or termination)
+
+#$ -M email@yourdomain
+
+
+##################
+#  (optional)
+#  Enter a name for this job that will appear in the cluster status
+#  (make sure there're no spaces in your job name)
+
+#$ -N BEST
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+#$ -S /bin/sh
+#$ -V
+#$ -e job.err
+#$ -o job.out
+#$ -cwd
+#$ -m aes
+export OMPI_MCA_plm_rsh_disable_qrsh=1
+/opt/openmpi/bin/mpirun -np $NSLOTS /share/apps/NMNH/BEST/best $NEXUSFILE

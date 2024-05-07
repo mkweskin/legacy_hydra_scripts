@@ -1,0 +1,70 @@
+#########################################################################
+#                                                                       #
+#   ExaML Hydra Submission                                              #
+#   8 May 2013                                                          #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#########################################################################
+
+##################
+#  This version of ExaML is for the high-speed InfiniBand networking available on some Hydra nodes.
+
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+##################
+#  Enter all your ExaML options between the single quotes including your input file and command line options.
+
+EXAMLOPTS=''
+
+
+##################
+#  Enter the number of CPUs to use after "#$ -pe orte "
+
+#$ -pe orte_ib 8
+
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+#    sTNi.q (max for is 3 hours, up to 384 CPUs used at once)
+#    mTNi.q (max is 36 hours, up to 192 CPUs at once)
+#    lTNi.q (max is 432 hours, up to 96 CPUs at once)
+#    vTNi.q (max is 108d hours, up to 48 CPUs at once)
+
+#$ -q lTNi.q
+
+
+##################
+#  Email address to be notified on job completion (or termination)
+
+#$ -M email@yourdomain
+
+
+##################
+#  (optional)
+#  Enter a name for this job that will appear in the cluster status
+#  (make sure there're no spaces in your job name)
+
+#$ -N ExaML-IB
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+#$ -S /bin/sh
+#$ -V
+#$ -e job.err
+#$ -o job.out
+#$ -cwd
+#$ -m aes
+
+export OMPI_MCA_plm_rsh_disable_qrsh=1
+/usr/mpi/gcc/openmpi-1.4.3/bin/mpirun -np $NSLOTS /share/apps/NMNH/ExaML/examl-IB $EXAMLOPTS

@@ -1,0 +1,63 @@
+#########################################################################
+#                                                                       #
+#   PhyML-serial Hydra Submission                                       #
+#   12 Feb 2014                                                         #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#########################################################################
+
+##################
+#  The serial version of PhyML will only use a single CPU on a cluster node.
+
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+##################
+#  Enter all your RAxML options between the single quotes including your input file and command line options.
+
+PHYMLOPTS=''
+
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+#    sTz.q (max for a rep is 3 hours, up to 768 CPUs used at once)
+#    mTz.q (max is 36 hours, up to 384 CPUs at once)
+#    lTz.q (max is 432 hours, up to 192 CPUs at once)
+#    uTz.q (no max runtime, up to 48 CPUs at once)
+
+#$ -q mTz.q
+
+
+##################
+#  Email address to be notified on job completion (or termination)
+
+#$ -M email@yourdomain
+
+
+##################
+#  (optional)
+#  Enter a name for this job that will appear in the cluster status
+#  (make sure there're no spaces in your job name)
+
+#$ -N PHYML
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+
+#$ -S /bin/sh
+#$ -V
+#$ -e job.err
+#$ -o job.out
+#$ -cwd
+#$ -m aes
+/share/apps/NMNH/PhyML/PhyML-serial $PHYMLOPTS

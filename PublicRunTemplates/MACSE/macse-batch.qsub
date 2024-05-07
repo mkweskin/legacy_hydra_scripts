@@ -1,0 +1,63 @@
+#########################################################################
+#                                                                       #
+#   MACSE Hydra Submission                                              #
+#   3 Nov 2014                                                          #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#                                                                       #
+#########################################################################
+
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+
+##################
+#  File with sequences to be aligned to (unzipped fasta) 
+#  (make sure there're no spaces after the '=' or in your filename)
+
+alignto='BIOCODE2014_MACSE_313.fasta'
+
+
+##################
+#  Enter the number of zip files to align after the '1-' 
+
+#$ -t 1-249
+
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+#    sTz.q (max for a rep is 3 hours, up to 768 CPUs used at once)
+#    mTz.q (max is 36 hours, up to 384 CPUs at once)
+#    lTz.q (max is 432 hours, up to 192 CPUs at once)
+#    uTz.q (no max runtime, up to 48 CPUs at once)
+
+#$ -q lTz.q
+
+
+##################
+#  (optional)
+#  Enter a name for this job that will appear in the cluster status
+#  (make sure there're no spaces in your job name)
+
+#$ -N macse-batch
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+#$ -S /bin/sh
+#$ -V
+#$ -j y
+#$ -o job.out
+#$ -cwd
+#$ -l mr=2G,h_data=2G,h_vmem=2G
+
+/share/apps/NMNH/MACSE/macse_batch_wrapper_simple $alignto $SGE_TASK_ID

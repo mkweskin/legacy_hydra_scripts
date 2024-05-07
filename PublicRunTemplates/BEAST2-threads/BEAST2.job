@@ -1,0 +1,4 @@
+#Using JAVA JDK 1.8.0_31 
+PATH=/share/apps/NMNH/BEAST2/jre/bin/:$PATH
+
+/share/apps/NMNH/BEAST2/bin/beast -threads $NSLOTS  testGTR.xml

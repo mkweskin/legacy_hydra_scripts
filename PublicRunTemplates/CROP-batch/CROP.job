@@ -1,0 +1,19 @@
+#!/bin/bash
+INPUTFILE="input.fasta"
+
+module load bioinformatics/crop/1.33
+
+export OMP_NUM_THREADS=$NSLOTS
+
+#Create new directory for this run and a link to fasta file
+mkdir $1 || exit 1
+cd $1
+
+#Make link from input file to current working directory
+ln ../$INPUTFILE .
+
+#Run CROP
+CROPLinux -i $INPUTFILE -o output.fasta -l 3 -u 4 -b 41660 -z 450
+
+#Cleanup
+rm -f *BlockSeq*

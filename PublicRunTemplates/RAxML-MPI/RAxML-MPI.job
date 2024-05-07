@@ -1,0 +1,2 @@
+export OMPI_MCA_plm_rsh_disable_qrsh=1
+/opt/openmpi/bin/mpirun -np $NSLOTS /share/apps/NMNH/RAxML/raxmlHPC-MPI-SSE3

@@ -1,0 +1,73 @@
+#########################################################################
+#                                                                       #
+#   Garli Hydra Submission                                              #
+#   5 Feb 2013                                                          #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#   Please See the README in this folder for how to configure your      #
+#   garli.conf to be used with the script                               #
+#                                                                       #
+#                                                                       #
+#########################################################################
+
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+##################
+#  Enter the name of your garli.conf file after the '='
+#  (make sure there're no spaces after the '=' or in your filename)
+
+GARLICONF=garli.conf
+
+
+##################
+#  Enter the number of bootstrap reps or search reps after '1-'
+#  e.g. 1-100 for 100 reps or 1-1000 for 1000 reps
+#  See README for more information.
+
+#$ -t 1-100
+
+
+##################
+#  RAM allocated for each Garli run. This should be the same as
+#  availablemememory in your garli.con
+#  M for megabytes, G for gigabytes (e.g. 512M or 1G)
+
+#$ -l s_data=512M
+
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+#    sTz.q (max for a rep is 3 hours, up to 768 CPUs used at once)
+#    mTz.q (max is 36 hours, up to 384 CPUs at once)
+#    lTz.q (max is 432 hours, up to 192 CPUs at once)
+#    uTz.q (no max runtime, up to 48 CPUs at once)
+
+#$ -q mTz.q
+
+
+##################
+#  (optional)
+#  Enter a name for this job that will appear in the cluster status
+#  (make sure there're no spaces in your job name)
+
+#$ -N GarliBatchJob
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+#$ -S /bin/sh
+#$ -V
+#$ -e job.err
+#$ -o job.out
+#$ -cwd
+./garli_batch_handler  $GARLICONF  $SGE_TASK_ID

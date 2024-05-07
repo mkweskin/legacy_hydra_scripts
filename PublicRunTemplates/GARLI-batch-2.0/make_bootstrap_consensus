@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# A simple script to call sumtrees.py (part of dendropy) and create a consensus of all the trees created by a bootstrap analysis.
+
+# Virtualenv was used to create a python environment with dendropy installed
+
+## Source the python environment with dendropy 
+source ~/py2.7.3/bin/activate
+
+## Create the consensus. Note this process is faster if you provide a list of trees in a file rather than using *boot.tre. 
+sumtrees.py *boot.tre --output=all.boot.consensus.tre
+
+## Deactivate the Python virtual env created above
+deactivate

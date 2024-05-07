@@ -1,0 +1,60 @@
+#########################################################################
+#                                                                       #
+#   SAP Hydra Submission                                                #
+#   19 Feb 2015                                                         #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#                                                                       #
+#########################################################################
+
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+SAPOPTS='-e user@domain -x 90 -x 80 --minidentity 0.7'
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+
+#$ -q mTz.q
+
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+
+#$ -S /bin/sh
+#$ -V
+#$ -j y
+#$ -cwd
+
+if [[ $# -eq 0 ]] ; then
+    echo 'Please enter the rep number. This script should be called from another script that provides this.'
+    exit 1
+fi
+
+#Stagger the starting of jobs by pausing the script
+sleep `bc -l <<< "$1*.5"`
+
+#Activate Python 2.7.3:
+source /share/apps/NMNH/SATe/py2.7.3-SATe/bin/activate
+
+#Include blast in the PATH
+PATH=/share/apps/NMNH/blast/bin:$PATH
+
+#Change into sub directory
+cd $1 || exit 1
+
+#Run SAP
+/share/apps/NMNH/SATe-2.2.7/py2.7.3-SATe/bin/sap $SAPOPTS $1.fasta
+
+#Delete cache folders
+rm -rf project*/*cache*

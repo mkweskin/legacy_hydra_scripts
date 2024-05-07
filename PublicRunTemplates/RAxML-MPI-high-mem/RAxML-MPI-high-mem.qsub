@@ -1,0 +1,82 @@
+#########################################################################
+#                                                                       #
+#   RAxML-MPI Hydra Submission                                          #
+#   19 Dec 2014                                                         #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#########################################################################
+
+##################
+#  The MPI version of RAxML will use CPUs across cluster nodes.
+#  This is for the high memory nodes for up to 16GB of RAM
+#  Please email "Korzennik, Sylvain" <skorzennik@cfa.harvard.edu> for access to high memory queues
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+##################
+#  Enter all your RAxML options between the single quotes including your input file and command line options.
+
+RAXMLOPTS=''
+
+
+##################
+#  Enter the number of CPUs to use after "#$ -pe openmp "
+#  
+#  All CPUs must be on one server. See: https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerConfig
+#  for the number of CPUs available on the cluster. As of 17 Apr 2013 there are up to 64
+#  CPUs available on a single server.
+
+#$ -pe orte 24
+
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+#    mThM.q (max is 36 hours, up to 384 CPUs at once)
+#    lThM.q (max is 18 days, up to 192 CPUs at once)
+#    vThM.q (max is 108 days, up to 98 CPUs at once)
+
+#$ -q lThM.q
+
+#################
+# Memory use, example is for 14G of use
+# mr can be up to 16G
+# h_data will kill the job if memory usage is over this value, can be a slightly higher value than mr, say .5G more
+# h_vmem will kill the job if virtual memory usage is over this amount. Since vmem usage is somewhat higher than real memory usage, this value can be ~2G greater than mr
+
+#$-l hm,mr=14G,h_data=14.5G,h_vmem=16G
+
+
+##################
+#  Email address to be notified on job completion (or termination)
+
+#$ -M email@yourdomain
+
+
+##################
+#  (optional)
+#  Enter a name for this job that will appear in the cluster status
+#  (make sure there're no spaces in your job name)
+
+#$ -N RAxML
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+
+#$ -S /bin/sh
+#$ -V
+#$ -e job.err
+#$ -o job.out
+#$ -cwd
+#$ -m aes
+export OMPI_MCA_plm_rsh_disable_qrsh=1
+/opt/openmpi/bin/mpirun -np $NSLOTS /share/apps/NMNH/RAxML/raxmlHPC-MPI-SSE3 $RAXMLOPTS

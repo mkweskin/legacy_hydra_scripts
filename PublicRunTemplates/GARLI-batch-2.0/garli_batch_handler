@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+# Version 1.0,  6 Dec 2012
+
+#It is fed two arguments, the garli.conf file name (which doesn't need to be garli.conf) 
+# and then rep number which is $SGE_TASK_ID interpretred by SGE.
+
+
+use strict;
+use warnings;
+
+
+scalar @ARGV eq 2 or die "Two arguments are expected: garli.conf file name and rep number\n";
+
+
+#The first argument is the garli.conf name
+my $garliconf = $ARGV[0];
+
+#The second argument is the rep number
+my $rep = $ARGV[1];
+
+#The binary to run
+my $garlicmd = "/share/apps/NMNH/Garli-2.0/Garli";
+
+#We need to modify the ofprefix parameter in the garli config file by
+#appending the rep number.
+
+#Add leading 0 and start numbering from 0.
+my $repformatted = sprintf(".run%02d", $rep-1);
+
+#Create a new configfile for this run
+open(NEW, "> $garliconf$repformatted") or die "unable to create $garliconf$repformatted: $!";
+
+#Open garli.conf
+open(GARLICONF, "< $garliconf") or die "unable to open $garliconf: $!";
+
+#Parse garli.conf, modifying ofprefix. ofprefix is required by Garli, so we can expect it.
+while (<GARLICONF>){
+	s/(\s*ofprefix\s*=\s*\S+)/$1$repformatted/i;
+	print NEW $_;
+}
+
+#Close the input and output files
+close(GARLICONF);
+close(NEW);
+
+#
+#Run Garli:
+#Submit job with supplied arguments
+system ("$garlicmd $garliconf$repformatted >/dev/null");
+
+#Delete the run-specific config file after the run
+system ("rm $garliconf$repformatted");
+
+exit;
+

@@ -1,0 +1,55 @@
+#########################################################################
+#                                                                       #
+#   BEAST2 Hydra Submission                                             #
+#   27 Feb 2015                                                         #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#                                                                       #
+#########################################################################
+
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+##################
+#  Number of threads to use 
+#  All CPUs must be on one server. See: https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerConfig
+#  for the number of CPUs available on the cluster. As of 17 Apr 2013 there are up to 64
+#  CPUs available on a single server.
+THREADS="4"
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+#    sTN.q (max for is 3 hours, up to 768 CPUs used at once)
+#    mTN.q (max is 36 hours, up to 384 CPUs at once)
+#    lTN.q (max is 18 days, up to 192 CPUs at once)
+#    vTN.q (max is 108 days, up to 98 CPUs at once)
+
+QUEUE="lTN.q"
+
+
+##################
+#  Email address to be notified on job completion (or termination)
+
+EMAIL="-m aes -M email@yourdomain.com"
+
+
+##################
+#  Enter a name for this job that will appear in the cluster status
+#  (make sure there're no spaces in your job name)
+
+NAME="BEAST2"
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+
+qsub -S /bin/sh -V -o job.out -j y -cwd $EMAIL -q $QUEUE -pe openmp $THREADS -l mr=2G,h_data=2.5G,h_vmem=3G   BEAST2.job

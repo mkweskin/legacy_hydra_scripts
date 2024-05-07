@@ -1,0 +1,27 @@
+#  RAxML-serial Hydra Submission
+#  A non-parallel verison of RAxML that only uses one core on one compute node
+
+
+#  Start your job by entereing the command: source RAxML-serial.qsub
+#  You need the file RAxML-serial.job which has your RAxML options
+
+#  Queue (-q):
+#    Specify the queue for your approximate run length.
+#    The parallel queues are:
+#      sTz.q (max 3 hours)
+#      mTz.q (max 36 hours)
+#      lTz.q (max 18 days)
+#      vTz.q (max 108 days)
+#      uTz.q (unlimited time)
+
+#  Memory: (mr, h_data, h_vmem)
+#    Jobs on the standard memory Hydra queues can request up to 4GB RAM/CPU
+#      Note: in parallel programs the total memory will be (Number of CPUs * RAM/CPU)
+#      so a request of 2GB of RAM and 8 CPUs will give your job 16GB of RAM
+#    For 2GB of RAM:
+#      -l mr=2G,h_data=2G,h_vmem=2.5G
+#        mr: amount a RAM you're reservering on the machine
+#        h_data: Kill the job if the RAM usage is over this amount
+#        h_vmem: Kill the job is the Virtual RAM usage is over this amount (this can be somewhat more than the h_data value)
+
+qsub -q lTz.q -N RAxML -S /bin/sh -V -j y -o job.out -cwd -l mr=2G,h_data=2G,h_vmem=2.5G RAxML-serial.job

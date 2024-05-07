@@ -1,0 +1,88 @@
+#########################################################################
+#                                                                       #
+#   SAP Hydra Submission                                                #
+#   19 Feb 2015                                                         #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#                                                                       #
+#########################################################################
+
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+##################
+#  Enter the name of your fasta file after the '='
+#  (make sure there're no spaces after the '=' or in your filename)
+
+FASTA='in.fasta'
+
+
+##################
+#  Enter the name of your configuration file after the '='
+#  (make sure there're no spaces after the '=' or in your filename)
+
+CONFIG='config.txt'
+
+
+##################
+#  Choose a name for your job after the '='
+#  (make sure there're no spaces after the '=' or in your filename)
+
+JOBNAME='SATe-job'
+
+
+##################
+#  Enter the number of CPUs to use after "#$ -pe openmp "
+#  
+#  All CPUs must be on one server. See: https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerConfig
+#  for the number of CPUs available on the cluster. As of 17 Apr 2013 there are up to 64
+#  CPUs available on a single server.
+
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+#    sTN.q (max for is 3 hours, up to 768 CPUs used at once)
+#    mTN.q (max is 36 hours, up to 384 CPUs at once)
+#    lTN.q (max is 18 days, up to 192 CPUs at once)
+#    vTN.q (max is 108 days, up to 98 CPUs at once)
+
+#$ -q mTz.q
+
+
+##################
+#  Email address to be notified on job completion (or termination)
+
+#$ -M                
+
+
+##################
+#  (optional)
+#  Enter a name for this job that will appear in the cluster status
+#  (make sure there're no spaces in your job name)
+
+#$ -N SAP-Test
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+
+#$ -S /bin/sh
+#$ -V
+#$ -e job.err
+#$ -o job.out
+#$ -cwd
+#$ -m aes
+
+#Activate Python 2.7.3:
+source /share/apps/NMNH/SATe/py2.7.3-SATe/bin/activate
+
+/share/apps/NMNH/SATe-2.2.7/py2.7.3-SATe/bin/sap -e user@domain   -x 90 -x 80 --minidentity 0.7 1.fasta

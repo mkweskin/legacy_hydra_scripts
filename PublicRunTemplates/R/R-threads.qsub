@@ -1,0 +1,88 @@
+#########################################################################
+#                                                                       #
+#   R-Threads Hydra Submission                                          #
+#   25 Apr 2014                                                         #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#   The threaded submission is for R modules that can use >1 CPU on a   #
+#   cluster node (e.g. mclapply).                                       #
+#                                                                       #
+#   Will run the version of R in: /share/apps/NMNH/R/bin/R              #
+#   which should be the newest version installed on Hydra               #
+#                                                                       #
+#   To install packages, start R from the command prompt with:          #
+#   /share/apps/NMNH/R/bin/R then use install.packages("packagename").  #
+#   When prompted to create a library in your home folder enter "y".    #
+#                                                                       #
+#########################################################################
+
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+##################
+#  Enter the name of your R script after the '='
+#  (make sure there're no spaces after the '=' or in your filename)
+
+RSCRIPT=rfile
+
+
+##################
+#  Enter the number of CPUs to use after "#$ -pe openmp "
+#  
+#  All CPUs must be on one server. See: https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerConfig
+#  for the number of CPUs available on the cluster. As of 17 Apr 2013 there are up to 64
+#  CPUs available on a single server.
+
+#$ -pe openmp 16
+
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+#    sTN.q (max for is 3 hours, up to 768 CPUs used at once)
+#    mTN.q (max is 36 hours, up to 384 CPUs at once)
+#    lTN.q (max is 18 days, up to 192 CPUs at once)
+#    vTN.q (max is 108 days, up to 98 CPUs at once)
+
+#$ -q lTN.q
+
+##################
+#  RAM allocated for your job Garli run. 2GB is the standard allocation
+#  for jobs on Hydra.
+#  M for megabytes, G for gigabytes (e.g. 512M or 1G)
+
+#$ -l s_data=2G
+
+
+##################
+#  (optional)
+#  Email address to be notified on job completion (or termination)
+
+#$ -M email@yourdomain
+
+
+##################
+#  (optional)
+#  Enter a name for this job that will appear in the cluster status
+#  (make sure there're no spaces in your job name)
+
+#$ -N R
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+#$ -S /bin/sh
+#$ -V
+#$ -e job.err
+#$ -o job.out
+#$ -cwd
+#$ -m aes
+/share/apps/NMNH/R/bin/R --no-save  <$RSCRIPT

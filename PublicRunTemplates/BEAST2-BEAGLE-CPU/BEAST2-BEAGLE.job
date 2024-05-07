@@ -1,0 +1,8 @@
+#Using JAVA JDK 1.8.0_31 
+PATH=/share/apps/NMNH/BEAST2/jre/bin/:$PATH
+
+/share/apps/NMNH/BEAST2/bin/beast -beagle -beagle_CPU -beagle_double -beagle_instances $NSLOTS testGTR.xml
+
+# Please note that in the script /share/apps/NMNH/BEAST2/bin/beast java.library.path
+# was modified to add /share/apps/NMNH/BEAGLE/lib so the beagle installation
+# would be found

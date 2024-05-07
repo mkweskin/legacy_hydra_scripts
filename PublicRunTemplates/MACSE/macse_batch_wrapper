@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+
+# This takes three arguments: reference sequence file name, zip file name, and the rep number (supplied by $SGE_TASK_ID)
+# Order of these is important!
+
+use strict;
+use warnings;
+use File::Copy;
+use Cwd;
+use File::Basename;
+
+
+#my @infiles=("infile","init_v_file","INTFILE");
+my $macsecmd = "java -jar -Xmx1000m /share/apps/NMNH/MACSE/macse_v1.0.0i_7.jar";
+
+die "Invalid arguments, expected three arguments, ref file, zip file and batch number" unless scalar @ARGV == 3;
+
+
+#Get the last two arguments used in this script
+my $reffile = $ARGV[0];
+my $zipfile = $ARGV[1];
+my $rep = $ARGV[2];
+
+#stagger the start of jobs
+sleep ($rep);
+
+#Unzip if this is the first rep
+if ($rep == 1){
+  my $unzipcmd = "/usr/bin/unzip -o";
+  system("$unzipcmd $zipfile") == 0 or die "system failed: $?";
+}
+
+#Det the total number of runs by parsing the job file for "-t 1-N" with N equal to an integer
+my $jobscript = "macse-batch.qsub";
+
+open(JOBSCRIPT, "$jobscript") or die "unable to open $jobscript: $!";
+
+my $numruns = 0;
+while (<JOBSCRIPT>){
+	chomp;
+	if (m/\s*\#\$\s+-t/){  # Matches "#$ -t"
+		s/\s*\#\$\s+-t\s+1-(\d+).*/$1/i;
+		$numruns = $_;
+	}
+}
+
+#print "Total runs: $numruns";
+
+close(JOBSCRIPT);
+
+#Move the files for this rep into place
+mkdir $rep, 0777 or die "can't create folder $rep: $!";
+
+#system("ls"); (for testing)
+
+
+move("$rep.fasta","$rep") or die "Cannot copy $rep.fasta to $rep: $!";
+copy("$reffile","$rep") or die "Cannot copy $reffile to $rep: $!";
+#symlink("$reffile","$rep/$reffile") or die "Cannot copy $reffile to $rep: $!";
+chdir($rep) or die "Can't change to directory: $1";
+#print "Rep $rep: current working directory: ";
+#system("pwd");
+
+#Run macse commands!
+system ("$macsecmd -prog enrichAlignment -seq $reffile -align $reffile -seq_lr ".$rep.".fasta -maxFS_inSeq 0 -maxSTOP_inSeq 0 -maxINS_inSeq 0 -maxDEL_inSeq 3 -gc_def 5 -fs_lr -10 -stop_lr -10 -out_NT ".$rep."_NT -out_AA ".$rep."_AA -seqToAdd_logFile ".$rep."_log.csv 2>&1 >".$rep.".out");
+system ("$macsecmd -prog exportAlignment -align ".$rep."_NT -charForRemainingFS - -gc_def 5 -out_AA ".$rep."_AA_macse.fasta -out_NT ".$rep."_NT_macse.fasta -statFile ".$rep.".csv 2>&1 >>".$rep.".out");
+
+#Mark that this run is complete
+chdir("..");
+#system("pwd");
+
+system ("touch .$rep.repcomplete");
+
+
+#Get count of complete runs
+opendir(DIR, ".") or die "unable to open direcotry: $!";
+my @complete = grep { /repcomplete/} readdir(DIR);
+closedir(DIR);
+
+#Check if there are more runs yet to complete, exit the script if there are more
+if (scalar @complete ne $numruns) {
+	exit;
+}
+
+#Zip the entire folder since we're at the last run
+#my $cwd = &Cwd::cwd();
+#my $basename = basename($cwd);
+my $ZipCommand = "zip -r _ALL_FILES.zip *";
+print "$ZipCommand\n";
+system ($ZipCommand);

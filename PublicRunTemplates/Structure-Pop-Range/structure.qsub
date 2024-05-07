@@ -1,0 +1,108 @@
+#########################################################################
+#                                                                       #
+#   Strucutre Hydra Submission                                          #
+#   21 May 2014                                                         #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#   This runs a range of populations size in structure                  #
+#                                                                       #
+#########################################################################
+
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+##################
+#  Input filename
+#  (make sure there're no spaces after the '=' or in your filename)
+
+inputfile='infile'
+
+
+
+##################
+#  mainparams filename
+#  (make sure there're no spaces after the '=' or in your filename)
+
+mainparamfile='mainparams'
+
+
+##################
+#  extraparamfile
+#  (make sure there're no spaces after the '=' or in your filename)
+#
+#  Leave blank if you don't have one
+
+extraparamfile=''
+
+
+##################
+#  Min K value
+#  (make sure there're no spaces after the '=' or in your filename)
+
+kmin='1'
+
+
+##################
+#  Max K value
+#  (make sure there're no spaces after the '=' or in your filename)
+
+kmax='5'
+
+
+##################
+#  Reps per K values
+#  (make sure there're no spaces after the '=' or in your filename)
+
+repspop='5'
+
+
+##################
+#  Multiply number of K values * Reps per K value and enter after '1-'
+#  
+
+#$ -t 1-25
+
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+#    sTz.q (max for a rep is 3 hours, up to 768 CPUs used at once)
+#    mTz.q (max is 36 hours, up to 384 CPUs at once)
+#    lTz.q (max is 432 hours, up to 192 CPUs at once)
+#    uTz.q (no max runtime, up to 48 CPUs at once)
+
+#$ -q mTz.q
+
+
+##################
+#  (optional)
+#  Enter a name for this job that will appear in the cluster status
+#  (make sure there're no spaces in your job name)
+
+#$ -N StructureBatch
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+#$ -S /bin/sh
+#$ -V
+#$ -e job.err
+#$ -o job.out
+#$ -cwd
+#$ -l mr=2G,h_data=2G,h_vmem=2.5G
+
+#If $extraparamfile value is given, add -e otherwise it will be blank and not used when the wrapper is executed
+if [ -n $extraparamfile ]
+    then
+    extraparamfile="-e $extraparamfile"
+fi
+
+/share/apps/NMNH/structure/structure_batch_wrapper_pop_range -i "$inputfile" -m "$mainparamfile" "$extraparamarg" -Kmin $kmin -Kmax $kmax -RepsPop $repspop -RepNum $SGE_TASK_ID

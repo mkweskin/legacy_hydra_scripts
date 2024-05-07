@@ -1,0 +1,74 @@
+#########################################################################
+#                                                                       #
+#   BEAST Hydra Submission                                              #
+#   17 Apr 2013                                                         #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#                                                                       #
+#########################################################################
+
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+##################
+#  Enter the name of your BEAST xml file after the '='
+#  (make sure there're no spaces after the '=' or in your filename)
+
+XMLFILE=MyFile.xml
+
+
+##################
+#  Enter the number of CPUs to use after "#$ -pe openmp "
+#  
+#  All CPUs must be on one server. See: https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerConfig
+#  for the number of CPUs available on the cluster. As of 17 Apr 2013 there are up to 64
+#  CPUs available on a single server.
+
+#$ -pe openmp 4
+
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+#    sTN.q (max for is 3 hours, up to 768 CPUs used at once)
+#    mTN.q (max is 36 hours, up to 384 CPUs at once)
+#    lTN.q (max is 18 days, up to 192 CPUs at once)
+#    vTN.q (max is 108 days, up to 98 CPUs at once)
+
+#$ -q lTN.q
+
+
+##################
+#  Email address to be notified on job completion (or termination)
+
+#$ -M email@yourdomain
+
+
+##################
+#  (optional)
+#  Enter a name for this job that will appear in the cluster status
+#  (make sure there're no spaces in your job name)
+
+#$ -N BEAST
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+
+PATH=/share/apps/oracle/jdk1.7.0_17/bin/:$PATH
+LD_LIBRARY_PATH=/share/apps/NMNH/BEAGLE/lib:$LD_LIBRARY_PATH
+#$ -S /bin/sh
+#$ -V
+#$ -e job.err
+#$ -o job.out
+#$ -cwd
+#$ -m aes
+/share/apps/NMNH/BEAST/bin/beast -threads $NSLOTS $XMLFILE

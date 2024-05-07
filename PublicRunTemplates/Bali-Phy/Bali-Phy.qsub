@@ -1,0 +1,71 @@
+#########################################################################
+#                                                                       #
+#   Bali-Phy Hydra Submission                                           #
+#   28 Mar 2013                                                         #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#   Will run the version in: /share/apps/NMNH/bali-phy/bin              #
+#   which should be the newest version installed on Hydra               #
+#                                                                       #
+#########################################################################
+
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+##################
+#  Enter the name of your sequence file after the '='
+#  You can put more than one file name seperated by spaces.
+#  (make sure there're no spaces after the '=' or in your filename)
+
+SEQUENCE='filename1'
+
+##################
+#  Enter any command line options for Bali-Phy after the '='
+#  (make sure there're no spaces after the '=' or in your filename)
+
+OPTIONS='--smodel GTR+gamma+INV'
+
+
+##################
+#  RAM allocated for your job run. 2GB is the standard allocation
+#  for jobs on Hydra.
+#  M for megabytes, G for gigabytes (e.g. 512M or 1G)
+
+#$ -l s_data=2G
+
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+#    sTz.q (max for a rep is 3 hours, up to 768 CPUs used at once)
+#    mTz.q (max is 36 hours, up to 384 CPUs at once)
+#    lTz.q (max is 432 hours, up to 192 CPUs at once)
+#    uTz.q (no max runtime, up to 48 CPUs at once)
+
+#$ -q mTz.q
+
+
+##################
+#  (optional)
+#  Enter a name for this job that will appear in the cluster status
+#  (make sure there're no spaces in your job name)
+
+#$ -N Bali-Phy 
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+#$ -S /bin/sh
+#$ -V
+#$ -e job.err
+#$ -o job.out
+#$ -cwd
+/share/apps/NMNH/bali-phy/bin/bali-phy $SEQUENCE $OPTIONS

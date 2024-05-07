@@ -1,0 +1,71 @@
+#########################################################################
+#                                                                       #
+#   Trimmomatic Hydra Submission                                        #
+#   3 Dec 2014                                                          #
+#   Matthew Kweskin                                                    #
+#                                                                       #
+#########################################################################
+
+##################
+#  The threaded version of Trimmomatic will use available CPUs within one cluster node for your job.
+
+
+####################################################
+#                                                  #
+#  Configure this section for your job             #
+#  Make sure to preserve spacing used in examples  #
+#                                                  #
+####################################################
+
+##################
+#  Enter Trimmomatic command here. Exclude java -jar trimmoatic-0.32.jar
+#  Use $NSOLTS after -threads to use the number of CPUs your request with the -pe command
+TRIMMOOPTS='PE -phred33 -threads $NSLOTS SI-22_S14_R1_001.fastq SI-22_S14_R2_001.fastq SI-22_S14_R1_001.pe.fastq SI-22_S14_R1_001.se.fastq SI-22_S14_R2_001.pe.fastq SI-22_S14_R2_001.se.fastq ILLUMINACLIP:adapters.fasta:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36'
+
+##################
+#  Enter the number of threads to use after "#$ -pe openmp "
+#  
+#  All CPUs must be on one server. See: https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerConfig
+#  for the number of CPUs available on the cluster. As of 17 Apr 2013 there are up to 64
+#  CPUs available on a single server.
+
+#$ -pe openmp 10
+
+##################
+#  Which Hydra queue to run on.
+#  https://www.cfa.harvard.edu/twiki/bin/view/HPC/HPCPrimerQueues#Queues
+#    sTN.q (max for is 3 hours, up to 768 CPUs used at once)
+#    mTN.q (max is 36 hours, up to 384 CPUs at once)
+#    lTN.q (max is 18 days, up to 192 CPUs at once)
+#    vTN.q (max is 108 days, up to 98 CPUs at once)
+
+#$ -q mTN.q
+
+
+##################
+#  Email address to be notified on job completion (or termination)
+
+#$ -M email@yourdomain
+
+
+##################
+#  (optional)
+#  Enter a name for this job that will appear in the cluster status
+#  (make sure there're no spaces in your job name)
+
+#$ -N Trimmomatic
+
+
+##############################
+#                            #
+#  DO NOT CHANGE BELOW HERE  #
+#                            #
+##############################
+#$ -l mr=2GB,h_data=2.5G,h_vmem=3G
+#$ -S /bin/sh
+#$ -V
+#$ -e job.err
+#$ -o job.out
+#$ -cwd
+#$ -m aes
+/share/apps/oracle/latest/bin/java -jar /share/apps/NMNH/Trimmomatic/trimmomatic-0.32.jar $TRIMMOOPTS

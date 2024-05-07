@@ -1,0 +1,4 @@
+#!/bin/sh
+
+module load bioinformatics/blast
+blastp -query $1 -db nr -outfmt 5 -max_target_seqs 1 -evalue 1e-5 -out $1.xml

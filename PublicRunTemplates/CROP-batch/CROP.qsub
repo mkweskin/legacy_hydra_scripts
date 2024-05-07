@@ -1,0 +1,1 @@
+qsub  -S /bin/sh -pe mthread 4 -q mThC.q -l mres=4G,h_data=4G,h_vmem=4G -cwd -j y ./CROP.job $1
